@@ -95,11 +95,10 @@ else
 }
 
 
-//Process a check on each identified endpoint
-
-$tests = array();
+//== Process a check on each identified endpoint ==
 
 //Grab all defined tests
+$tests = array();
 foreach (glob("tests/*.php") as $filename) 
 {
     include $filename;
@@ -112,12 +111,41 @@ while ($looper > 0)
 {
     $looper = $looper - 1;
 
-    $testloop = 0;
-
-    while ($tests[$testloop] != '')
+    //Make sure that the identified endpoint is still valid, if a domain name
+    if ($domainarray[$looper]['domain'] != '')
     {
-        $tests[$testloop]($dbConnection,$checkid,$domainarray[$looper]);
-        $testloop++;
+        $dnscheck = dns_get_record($domainarray[$looper]['domain'],DNS_ALL);
+
+        //If there is no returned host, then the hostname does not exist and should be skipped / disabled
+        if ($dnscheck[0]['host'] == '')
+        {
+            $stmt = $dbConnection->prepare('UPDATE endpoints SET epenabled = 0 WHERE epid = :epid');
+            $stmt->execute([ 'epid' => $domainarray[$looper]['epid'] ]);
+        }
+        //Otherwise, if the domain still exists, proceed
+        else
+        {
+            //Process the endpoint for all defined tests
+            $testloop = 0;
+
+            while ($tests[$testloop] != '')
+            {
+                $tests[$testloop]($dbConnection,$checkid,$domainarray[$looper]);
+                $testloop++;
+            }
+        }
+    }
+    //If not a domain name, then check the IP address or process the checks
+    else
+    {
+        //Process the endpoint for all defined tests
+        $testloop = 0;
+
+        while ($tests[$testloop] != '')
+        {
+            $tests[$testloop]($dbConnection,$checkid,$domainarray[$looper]);
+            $testloop++;
+        }
     }
 }
 
