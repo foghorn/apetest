@@ -31,7 +31,7 @@ function endpoint_check($dbConnection,$endpoint = '')
         $row = $stmt->fetch();
 
         //If no duplicate then insert the new record
-        if ($row['epid'] >= 0)
+        if (($row['epid'] >= 0) AND ($row['epid'] != ''))
         {
             $return = $row['epid'];
         }
