@@ -1,0 +1,79 @@
+-- phpMyAdmin SQL Dump
+-- version 5.1.2
+-- https://www.phpmyadmin.net/
+--
+-- Host: mysql.notaserver.net
+-- Generation Time: Sep 08, 2022 at 08:57 AM
+-- Server version: 8.0.29-0ubuntu0.20.04.3
+-- PHP Version: 7.4.3
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `apetest`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `endpoints`
+--
+
+CREATE TABLE `endpoints` (
+  `epid` int NOT NULL,
+  `rootdomain` int NOT NULL,
+  `epenabled` int NOT NULL,
+  `domain` text NOT NULL,
+  `ipaddress` text NOT NULL,
+  `lastcheck` datetime NOT NULL,
+  `added` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ep_test_results`
+--
+
+CREATE TABLE `ep_test_results` (
+  `checkid` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
+  `epid` int NOT NULL,
+  `name` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
+  `output` text COLLATE utf8mb4_general_ci NOT NULL,
+  `alarm` int NOT NULL,
+  `checktime` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `endpoints`
+--
+ALTER TABLE `endpoints`
+  ADD PRIMARY KEY (`epid`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `endpoints`
+--
+ALTER TABLE `endpoints`
+  MODIFY `epid` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
