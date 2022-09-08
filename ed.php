@@ -49,6 +49,14 @@ else
     {
         include $filename;
     }
+
+    //Loop through all sources that DO NOT require a domain
+    $testloop = 0;
+    while ($sources[$testloop][1] == 0)
+    {
+        $sources[$testloop][0]($dbConnection,$row['domain']);
+        $testloop++;
+    }
     
     //Grab all defined "root domains", the highest level domains which will be the starting point for enumeration
     $stmt = $dbConnection->query("SELECT * FROM endpoints WHERE rootdomain = 1")->fetchAll();
@@ -63,9 +71,10 @@ else
 
             $testloop = 0;
 
-            while ($sources[$testloop] != '')
+            //Loop through all sources that require a domain
+            while ($sources[$testloop][1] == 1)
             {
-                $sources[$testloop]($dbConnection,$row['domain']);
+                $sources[$testloop][0]($dbConnection,$row['domain']);
                 $testloop++;
             }
 

@@ -1,6 +1,6 @@
 <?php
 //Register the function
-array_push($sources,'apetest_crtsh');
+array_push($sources,array('apetest_crtsh',1));
 
 //Define the source test
 function apetest_crtsh($dbConnection,$domain = '')

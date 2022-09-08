@@ -129,3 +129,69 @@ The following variables should be passed (in this order) when using this functio
 |`'apetest_http'`|This value should be the string for the test being performed so that it can be identified later.|
 |`$result`|Whatever results you want to store. This can be a base64 encoded output of the HTTP response or anything else that will fit in a text field in a MySQL database.|
 |`$alert`|Should this result trigger an alert? You should store a `1` for yes and a `0` for no.|
+
+## Adding New Sources for Endpoint Detection
+
+By default, the system uses `crt.sh` for detecting new endpoints. This is a website that tries to detect new subdomains based on SSL certificates that it has seen in the wild. While this might be a good starting point, there are no doubt other sources for endpoints that should be considered for your environment.
+
+Similarly to the way that checks can be created in a modular way and added to the system, new sources for endpoints can also be added and checked on a regular basis. These sources should be placed in the `sources/` folder, and the system ships with a `crtsh.php` source file already configured for use. Any source can be considered which can be accessed through a PHP script.
+
+Here's a sample of what a source file should look like based on the `crtsh.php` file:
+
+```
+<?php
+//Register the function
+array_push($sources,array('apetest_crtsh',1));
+
+//Define the source test
+function apetest_crtsh($dbConnection,$domain = '')
+{
+    //Do something
+    endpoint_check($dbConnection,$endpoint);
+}
+```
+
+Let's dive into more detail.
+
+Just like with the checks, all sources are defined as a function. The name of each function is passed into an array named `$sources` that is then referenced by the main script. However, unlike with the checks, each new source will need to pass an array of values instead of just the name. This is because the system considers not only blind sources (ones that do not require a starting point, like a txt file with new endpoints being constantly added) as well as sources which need a defined jumping-off point (such as `crt.sh`). 
+
+Values should be pushed into the `$sources` array in the following format:
+
+```
+array_push($sources,array('apetest_crtsh',1));
+```
+
+The first element of the array (in this case `apetest_crtsh`) is the name of the function that will operate the source. Note that all default sources included in this system use the prefix `apetest_`, and I recommend you use your own prefix as well in case others create new bundles of sources that are useful down the road.
+
+The second element of the array is a value that determines whether the source needs to have a domain name passed to it to operate properly.
+
+|Value|Definition|
+|--|--|
+|0|This source does not need a domain name passed to it in order to operate.|
+|1|This source needs a domain name passed to it before it can function properly.|
+
+Each function should still be defined with two values, even if the domain name is not required as part of the operation.
+
+```
+function apetest_crtsh($dbConnection,$domain = '')
+```
+
+In this function there are two values that are being passed from the main script:
+
+|Value|Detail|
+|--|--|
+|`$dbConnection`|The PDC databse connection once again.|
+|`$domain`|An optional domain name that may be provided to help as a jumping off point.|
+
+Once the source has been checked, the results should be passed to the `endpoint_check` function to be added for future analysis. 
+
+```
+endpoint_check($dbConnection,$endpoint);
+```
+
+This function only accepts one endpoint at a time, and can be called as many times as necessary within the script. If importing multiple endpoints you should probably call it within a `while` loop.
+
+|Value|Detail|
+|--|--|
+|`$dbConnection`|The PDC databse connection once again.|
+|`$endpoint`|The endpoint that needs to be added to the list for future checks and analysis|
