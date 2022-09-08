@@ -1,6 +1,6 @@
 <?php
 
-function insert_result($dbConnection,$checkid,$epid,$fname,$result,$alarm)
+function insert_result($dbConnection,$checkid,$epid,$fname,$result,$alarm = 0)
 {
     $stmt = $dbConnection->prepare("INSERT INTO ep_test_results (checkid,epid,name,output,alarm,checktime) VALUES (:checkid,:epid,:fname,:result,:alarm,CURRENT_TIMESTAMP())");
     $stmt->execute([ 'checkid' => $checkid, 'epid' => $epid, 'fname' => $fname, 'result' => $result, 'alarm' => $alarm ]);

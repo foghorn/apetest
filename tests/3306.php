@@ -1,10 +1,10 @@
 <?php
 
 //Register the function
-array_push($tests,'apetest_http');
+array_push($tests,'apetest_3306');
 
 //Define the function
-function apetest_http($dbConnection,$checkid,$data)
+function apetest_3306($dbConnection,$checkid,$data)
 {
     if ($data['domain'] != '')
         $endpoint = $data['domain'];
@@ -13,20 +13,16 @@ function apetest_http($dbConnection,$checkid,$data)
     
     if ($endpoint != '')
     {
-        $fp = fsockopen($endpoint, 80, $errno, $errstr, 2);
+        $fp = fsockopen($endpoint, 3306, $errno, $errstr, 2);
 	
-        //Port closed
         if ($fp == FALSE)
         {
         $result = 0;
         } 
-        //Port open
         else 
         {
-            $result = get_headers('http://' . $endpoint . '/', true);
-
-            $result = json_encode($result);
-            fclose($fp);
+        $result = 1;
+        fclose($fp);
         }
     }
     else
@@ -34,7 +30,7 @@ function apetest_http($dbConnection,$checkid,$data)
         $result = 0;
     }
 
-    insert_result($dbConnection,$checkid,$data['epid'],'apetest_http',$result,0);
+    insert_result($dbConnection,$checkid,$data['epid'],'apetest_3306',$result,0);
 }
 
 //Define the alert trigger
