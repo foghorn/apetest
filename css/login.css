@@ -1,0 +1,53 @@
+/* CSS Document */
+body{
+	margin-top: 100px;
+}
+.panel-body{
+	padding: 24px;
+}
+.panel-heading {
+    padding: 24px 24px 12px;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.panel-heading h3{
+	font-size: 20px;
+	font-weight: 300;
+	text-transform: uppercase;
+}
+.panel-default>.panel-heading{
+	background-color: #fff;
+	border-color: none;
+}
+
+.btn.btn-login{
+	background-color: #243B5C;
+	color: #F5D426;
+	font-size: 16px;
+	border-color: #243B5C;
+}
+.login-panel .form-group{
+	margin-bottom: 24px;
+}
+.login-panel input{
+    padding: 12px 24px !important;
+    font-size: 16px;
+    font-weight: 300;
+		height: auto;
+}
+.checkbox input[type=checkbox], .checkbox-inline input[type=checkbox]{
+    margin-top: 2px;
+}
+
+.btn.btn-login:hover, .btn.btn-login:focus, .btn.btn-login:active{
+	background-color: #11233E;
+	color: #F5D426;
+}
+
+#btn-forgot-password{
+	margin-bottom: 24px;
+	font-size: 14px;
+	color: #1AA5DF;
+	font-weight: 300;
+}

@@ -16,6 +16,117 @@ function guidv4($data)
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
+function inputSanitize($input)
+{
+	$input = str_replace("\"","",$input);
+	$input = str_replace("'","",$input);
+	$input = filter_var($input,FILTER_SANITIZE_STRING);
+	$input = ltrim(rtrim($input));
+	$input = addslashes($input);
+	
+	return $input;
+}
+
+function passHash($PASS,$username)
+{
+    $PASS = $PASS . md5($PASS) .$username;
+    $PASS = sha1($PASS);
+    return $PASS;
+}
+
+function redirectHeader($domain = '')
+{
+	if ($domain == '')
+    {
+        $domain = $_SERVER['SERVER_NAME'];
+    }
+    
+	if (strtolower($domain) == 'wt.iatu.io')
+	{
+		header('Location: https://wt.iatu.io/dashboard.php', true, 303);
+	}
+    elseif (strtolower($domain) == 'nickleghorn.com')
+	{
+		header('Location: https://nickleghorn.com/dctest/dashboard.php', true, 303);
+	}
+    elseif( isset($_SERVER['HTTPS'] ) ) 
+	{
+		header('Location: https://' . $domain . '/dashboard.php', true, 303);
+	}
+	else
+	{
+		header('Location: http://' . $domain . '/dashboard.php', true, 303);
+	}
+}
+
+function SessionCheck($domain = '')
+{
+    if ($domain == '')
+    {
+        $domain = $_SERVER['SERVER_NAME'];
+    }
+    
+    if ($_SESSION['PERMIT'] != 1)
+    {
+        header('Location: https://' . $domain . '/', true, 303);
+		die();
+    }
+    elseif ($_SESSION['LoginTimestamp'] != date("Y-m-d"))
+    {
+        $_SESSION['PERMIT'] = 0;
+		$_SESSION['USER'] = 0;
+		$_SESSION['ACCOUNT'] = 0;
+		$_SESSION['FIRSTLOGIN'] = 0;
+		$_SESSION['EMAIL'] = "";
+		$_SESSION['LoginTimestamp'] = 0;
+		session_destroy();
+        header('Location: https://' . $domain . '/', true, 303);
+		die();
+    }
+}
+
+function navHeader()
+{
+	?>
+	<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+		<a class="navbar-brand" href="dashboard.php"><img src="images/iatu_white.png" height="40" alt="Watchtower"></a>
+	   <ul class="nav navbar-top-links navbar-right">
+			<li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+			  <div id="dd-profile"></div>
+			  <i class="fa fa-caret-down"></i> </a>
+			  <ul class="dropdown-menu dropdown-user">
+			    <li><a href="dashboard.php">Home</a> </li>
+				<li class="divider"></li>
+				<!--<li><a href="settings.php">Account Settings</a> </li>
+				<li><a href="ticket.php">Support Tickets</a> </li>-->
+				<li class="divider"></li>
+				<li><a href="index.php?logout=1"> Logout</a> </li>
+			  </ul>
+			</li>
+		  </ul>
+	  </nav>
+	<?php
+}
+
+function announcementDisplay($title,$text,$link)
+{
+	?>
+	 <div class="row">
+        <div class="col-md-12 col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-heading"> <?php echo $title; ?> </div>
+            <div class="panel-divider"></div>
+            <div class="panel-body">
+			<?php echo nl2br($text); ?>
+            </div>
+            <div class="panel-footer text-right">
+			<?php echo $link; ?>
+            </div>
+          </div>
+        </div>
+      </div>
+	<?
+}
 
 function endpoint_check($dbConnection,$endpoint = '')
 {
