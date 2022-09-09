@@ -128,7 +128,7 @@ function announcementDisplay($title,$text,$link)
 	<?
 }
 
-function endpoint_check($dbConnection,$endpoint = '')
+function endpoint_check($dbConnection,$endpoint = '',$rootdomain = 0)
 {
     //Domain name for endpoint
     if (($endpoint != '') AND (filter_var($endpoint, FILTER_VALIDATE_DOMAIN,FILTER_FLAG_HOSTNAME)))
@@ -149,8 +149,8 @@ function endpoint_check($dbConnection,$endpoint = '')
         else
         {
             //Insert new endpoint
-            $stmt = $dbConnection->prepare('INSERT INTO endpoints (epenabled,added,domain) VALUES (1,CURRENT_TIMESTAMP(),:endpoint)');
-            $stmt->execute([ 'endpoint' => $endpoint ]);
+            $stmt = $dbConnection->prepare('INSERT INTO endpoints (epenabled,added,domain,rootdomain) VALUES (1,CURRENT_TIMESTAMP(),:endpoint,:rootdomain)');
+            $stmt->execute([ 'endpoint' => $endpoint, 'rootdomain' => $rootdomain ]);
 
             //Grab new endpoint's EPID
             $stmt = $dbConnection->prepare('SELECT epid FROM endpoints  WHERE domain = :endpoint');

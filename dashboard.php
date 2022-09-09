@@ -129,11 +129,107 @@ if ($_GET['page'] == '')
 {
 	?><h2 class="page-header">Scan Reports</h2><?php
 	//Handle adding new endpoint
+	if ($_POST['csrf'] == $_SESSION['CSRFTOKEN'])
+	{
+		$return = endpoint_check($dbConnection,$_POST['endpoint'],$_POST['scan']);
+
+		if ($return != '')
+			echo "Endpoint ID " . $return . " added.<br><br>";
+	}
+
+	//Setup for new endpoint
+	$_SESSION['CSRFTOKEN'] = md5(time());
+	?>
+	<h3>Add a New Endpoint</h3>
+	<form action='dashboard.php' method='post'>
+	<table border=0>
+	<tr>
+	<td><label for="endpoint">Endpoint address (domain or IP):</label></td><td><input type="text" id="endpoint" name="endpoint"></td>
+	</tr><tr>
+	<td>Scan for subdomains? </td>
+	<td><input type="radio" id="scan" name="scan" value="1"><label for="1"> Yes</label><br><input type="radio" id="scan" name="scan" value="0" checked="checked"><label for="0"> No</label></td>
+	</tr>
+	</table>
+	<input type="hidden" id="csrf" name="csrf" value=<?php echo '"' . $_SESSION['CSRFTOKEN'] . '"'; ?>>
+	<input type="submit" value="Submit">
+	</form><br>
+
+	<?php
 
 	//== Display endpoints and latest scan ==
 
+	?><h3>Active Endpoints</h3><?php
 	//Get endpoints
 	$stmt = $dbConnection->query("SELECT * FROM endpoints WHERE epenabled = 1")->fetchAll();
+
+	foreach ($stmt as $row) 
+	{
+		if ($row['domain'] != '')
+			$endpointname = $row['domain'];
+		elseif ($row['ipaddress'] != '')
+			$endpointname = $row['ipaddress'];
+		else
+			$endpointname = $row['epid'];
+		
+		?>
+		<br>
+		<button class="accordion"><?php echo $endpointname; ?></button>
+		<div class="panel">
+			<p>
+		<table border=1>
+					<tr>
+						<td>Endpoint ID</td><td><?php echo $row['epid']; ?></td>
+					</tr><tr>
+						<td>Domain</td><td><?php echo $row['domain']; ?></td>
+					</tr><tr>
+						<td>IP Address</td><td><?php echo $row['ipaddress']; ?></td>
+					</tr><tr>
+						<td>Added</td><td><?php echo $row['added']; ?></td>
+					</tr><tr>
+						<td>Last Scanned</td><td><?php echo $row['lastcheck']; ?></td>
+					</tr><tr>
+						<td>Root Domain?</td><td><?php echo $row['rootdomain']; ?></td>
+					</tr>
+				</table>
+				<br><br>
+				Last Scan Results:
+				<table border=1>
+					<tr>
+						<td>Test Name and Timestamp</td><td>Output</td><td>Alarm</td>
+					</tr>
+				<?php
+					$stmt2 = $dbConnection->query("SELECT * FROM ep_test_results WHERE epid = " . $row['epid'] . " AND checkid = (SELECT DISTINCT checkid FROM ep_test_results WHERE epid = " . $row['epid'] . " ORDER BY checktime DESC LIMIT 1)")->fetchAll();
+
+					foreach ($stmt2 as $row2) 
+					{
+						echo "<tr>";
+						
+						echo "<td>";
+						echo $row2['name'] . "<br>" . $row2['checktime'];
+						echo "</td>";
+
+						echo "<td>";
+						echo $row2['output'];
+						echo "</td>";
+
+						echo "<td>";
+						echo $row2['alarm'];
+						echo "</td>";
+
+						echo "</tr>";
+					}
+				?>
+				</table>
+				</p>
+
+		</div>
+
+		<?php
+	}
+
+	?><h3>Inactive Endpoints</h3><?php
+	//Get endpoints
+	$stmt = $dbConnection->query("SELECT * FROM endpoints WHERE epenabled = 0")->fetchAll();
 
 	foreach ($stmt as $row) 
 	{

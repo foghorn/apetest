@@ -107,7 +107,7 @@ foreach (glob("tests/*.php") as $filename)
 //Create a UUID for the check
 $checkid = guidv4(openssl_random_pseudo_bytes(16));
 
-while ($looper > 0)
+while (($looper > 0) AND ($domainarray[($looper-1)]['epid'] != ''))
 {
     $looper = $looper - 1;
 
