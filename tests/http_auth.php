@@ -21,25 +21,31 @@ function apetest_http_auth($dbConnection,$checkid,$data)
         
         while (($check > 0) AND ($check < 10))
         {
-            $result = array_change_key_case(get_headers($url, true),CASE_LOWER);
+            error_log("==========" . $url, 0);
+            $return = array_change_key_case(get_headers($url, true),CASE_LOWER);
+
+            if ($return['location'] != '')
+                $redirect = ($return['location']);
+            elseif ((is_array($return['location'])) AND ($return['location'][0] != ''))
+                $redirect = ($return['location']);
 
 
             //See if this is redirecting to another page on the site
-            if (($result['location'][0] != '') AND (substr_count(strtolower($result['location'][0]),strtolower($endpoint)) > 0))
+            if (($redirect != '') AND (substr_count(strtolower($redirect),strtolower($endpoint)) > 0))
             {
-                $url = $result['location'][0];
+                $url = $redirect;
                 $check++;
             }
 
             //If this is redirecting to a different domain, check what domain it is and whether that is a known auth domain
-            elseif ($result['location'][0] != '')
+            elseif ($redirect != '')
             {
-                if (substr_count($result['location'][0],'accounts.google.com') > 0)
+                if (substr_count($redirect,'accounts.google.com') > 0)
                 {
                     $result = "Google Auth";
                     $alert = 0;
                 }
-                elseif (substr_count($result['location'][0],'login.microsoftonline.com') > 0)
+                elseif (substr_count($redirect,'login.microsoftonline.com') > 0)
                 {
                     $result = "Microsoft Auth";
                     $alert = 0;
@@ -52,7 +58,7 @@ function apetest_http_auth($dbConnection,$checkid,$data)
 
                 $check = 0;
             }
-            elseif ($result[0] != '')
+            elseif ($return[0] != '')
             {
                 if (substr_count($result[0],'401') > 0)
                 {
