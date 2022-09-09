@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="129px" height="129px" viewBox="0 0 129 129" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>alert-red</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="64.5" cy="64.5" r="43.5"></circle>
+    </defs>
+    <g id="NT-Dashboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-11" transform="translate(-10.000000, -10.000000)">
+            <g id="alert-red" transform="translate(10.000000, 10.000000)">
+                <circle id="Oval-3-Copy" fill="#EBAEB5" cx="64.5" cy="64.5" r="64.5"></circle>
+                <g id="Oval-3-Copy">
+                    <use fill="#EBAEB5" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    <circle stroke="#FFFFFF" stroke-width="16" cx="64.5" cy="64.5" r="51.5"></circle>
+                </g>
+                <path d="M64.5,21 C40.4761364,21 21,40.4761364 21,64.5 C21,88.5238636 40.4761364,108 64.5,108 C88.5238636,108 108,88.5238636 108,64.5 C108,40.4761364 88.5238636,21 64.5,21 Z M64.5,100.090909 C44.8261364,100.090909 28.9090909,84.1738636 28.9090909,64.5 C28.9090909,44.8261364 44.8261364,28.9090909 64.5,28.9090909 C84.1738636,28.9090909 100.090909,44.8261364 100.090909,64.5 C100.090909,84.1738636 84.1738636,100.090909 64.5,100.090909 Z" id="Shape" fill="#BD3849" fill-rule="nonzero"></path>
+                <g id="Group" transform="translate(59.000000, 39.000000)" fill="#BD3849">
+                    <rect id="Path" x="0" y="0" width="11" height="36" rx="5.5"></rect>
+                    <circle id="Path" cx="5.5" cy="45.5" r="5.5"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

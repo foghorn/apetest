@@ -42,26 +42,7 @@ SessionCheck();
 <!-- Custom Fonts -->
 <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script>
-	var acc = document.getElementsByClassName("accordion");
-var i;
 
-for (i = 0; i < acc.length; i++) {
-  acc[i].addEventListener("click", function() {
-    /* Toggle between adding and removing the "active" class,
-    to highlight the button that controls the panel */
-    this.classList.toggle("active");
-
-    /* Toggle between hiding and showing the active panel */
-    var panel = this.nextElementSibling;
-    if (panel.style.display === "block") {
-      panel.style.display = "none";
-    } else {
-      panel.style.display = "block";
-    }
-  });
-}
-</script>
 
 <style>
 .chart {
@@ -164,16 +145,22 @@ if ($_GET['page'] == '')
 			$endpointname = $row['epid'];
 		
 		?>
+		<br>
 		<button class="accordion"><?php echo $endpointname; ?></button>
 		<div class="panel">
-			<!--<p>-->
-				<table border=1>
+			<p>
+		<table border=1>
 					<tr>
 						<td>Endpoint ID</td><td><?php echo $row['epid']; ?></td>
+					</tr><tr>
 						<td>Domain</td><td><?php echo $row['domain']; ?></td>
+					</tr><tr>
 						<td>IP Address</td><td><?php echo $row['ipaddress']; ?></td>
+					</tr><tr>
 						<td>Added</td><td><?php echo $row['added']; ?></td>
+					</tr><tr>
 						<td>Last Scanned</td><td><?php echo $row['lastcheck']; ?></td>
+					</tr><tr>
 						<td>Root Domain?</td><td><?php echo $row['rootdomain']; ?></td>
 					</tr>
 				</table>
@@ -184,8 +171,7 @@ if ($_GET['page'] == '')
 						<td>Test Name and Timestamp</td><td>Output</td><td>Alarm</td>
 					</tr>
 				<?php
-					$stmt2 = $dbConnection->query("SELECT * FROM ep_test_results WHERE epid = :epid ");
-					$stmt2->execute([ 'epid' => $row['epid'] ]);
+					$stmt2 = $dbConnection->query("SELECT * FROM ep_test_results WHERE epid = " . $row['epid'] . " AND checkid = (SELECT DISTINCT checkid FROM ep_test_results WHERE epid = " . $row['epid'] . " ORDER BY checktime DESC LIMIT 1)")->fetchAll();
 
 					foreach ($stmt2 as $row2) 
 					{
@@ -207,8 +193,8 @@ if ($_GET['page'] == '')
 					}
 				?>
 				</table>
+				</p>
 
-			<!--</p>-->
 		</div>
 
 		<?php
@@ -228,4 +214,24 @@ if ($_GET['page'] == '')
 </div>
 
 <div style="height:75px; width: 100%; "></div>
+<script>
+		var acc = document.getElementsByClassName("accordion");
+	var i;
+
+	for (i = 0; i < acc.length; i++) {
+	acc[i].addEventListener("click", function() {
+		/* Toggle between adding and removing the "active" class,
+		to highlight the button that controls the panel */
+		this.classList.toggle("active");
+
+		/* Toggle between hiding and showing the active panel */
+		var panel = this.nextElementSibling;
+		if (panel.style.display === "block") {
+		panel.style.display = "none";
+		} else {
+		panel.style.display = "block";
+		}
+	});
+	}
+	</script>
 </body>

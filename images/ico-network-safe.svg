@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="129px" height="129px" viewBox="0 0 129 129" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 11</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="64.5" cy="64.5" r="43.5"></circle>
+    </defs>
+    <g id="NT-Dashboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="mockup-v1-copy" transform="translate(-159.000000, -242.000000)">
+            <g id="Group-11" transform="translate(159.000000, 242.000000)">
+                <circle id="Oval-3-Copy" fill="#CDE8AE" cx="64.5" cy="64.5" r="64.5"></circle>
+                <g id="Oval-3-Copy">
+                    <use fill="#CDE8AE" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    <circle stroke="#FFFFFF" stroke-width="16" cx="64.5" cy="64.5" r="51.5"></circle>
+                </g>
+                <path d="M64.5,21 C40.4761364,21 21,40.4761364 21,64.5 C21,88.5238636 40.4761364,108 64.5,108 C88.5238636,108 108,88.5238636 108,64.5 C108,40.4761364 88.5238636,21 64.5,21 Z M64.5,100.090909 C44.8261364,100.090909 28.9090909,84.1738636 28.9090909,64.5 C28.9090909,44.8261364 44.8261364,28.9090909 64.5,28.9090909 C84.1738636,28.9090909 100.090909,44.8261364 100.090909,64.5 C100.090909,84.1738636 84.1738636,100.090909 64.5,100.090909 Z M76.9568182,51.6477273 L60.2488636,68.3556818 L53.5261364,61.6329545 C51.6477273,59.7545455 48.6818182,59.7545455 46.8034091,61.6329545 C44.925,63.5113636 44.925,66.4772727 46.8034091,68.3556818 L56.8875,78.3409091 C58.7659091,80.2193182 61.7318182,80.2193182 63.6102273,78.3409091 L83.6795455,58.2715909 C85.5579545,56.3931818 85.5579545,53.4272727 83.6795455,51.5488636 C81.8011364,49.7693182 78.7363636,49.7693182 76.9568182,51.6477273 Z" id="Shape" fill="#5E8F41" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

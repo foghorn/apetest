@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="129px" height="129px" viewBox="0 0 129 129" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 12</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="NT-Dashboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="mockup-v1-copy" transform="translate(-759.000000, -242.000000)">
+            <g id="Group-12" transform="translate(759.000000, 242.000000)">
+                <circle id="Oval-3-Copy" stroke="#EBAEB5" stroke-width="4" cx="64.5" cy="64.5" r="62.5"></circle>
+                <circle id="Oval-3-Copy" fill="#BD3849" cx="64.5" cy="64.5" r="43.5"></circle>
+                <text id="123.4" font-family="OpenSans, Open Sans" font-size="22" font-weight="normal" fill="#FFFFFF">
+                    <tspan x="36.4145508" y="65">123.4</tspan>
+                </text>
+                <text id="Mbps" font-family="Gilroy-Light, Gilroy" font-size="16" font-weight="300" fill="#FFFFFF">
+                    <tspan x="44.14" y="85">Mbps</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
