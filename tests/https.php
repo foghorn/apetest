@@ -35,6 +35,8 @@ function apetest_https($dbConnection,$checkid,$data)
                 $result = $result . fgets($fp, 128);
             }
             fclose($fp);
+
+            $result = "B64|" . base64_encode($result);
         }
     }
     else

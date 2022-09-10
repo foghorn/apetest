@@ -268,9 +268,9 @@ function dashboardaccordion($dbConnection,$query)
 				</table>
 				<br><br>
 				Last Scan Results:
-				<table border=1>
+				<table border=1 style="width:100%;">
 					<tr>
-						<td>Test Name and Timestamp</td><td>Output</td><td>Alarm</td>
+						<td>Test Name and Timestamp</td><td style="width:70%">Output</td><td>Alarm</td>
 					</tr>
 				<?php
 					$stmt2 = $dbConnection->query("SELECT * FROM ep_test_results WHERE epid = " . $row['epid'] . " AND checkid = (SELECT DISTINCT checkid FROM ep_test_results WHERE epid = " . $row['epid'] . " ORDER BY checktime DESC LIMIT 1)")->fetchAll();
@@ -285,7 +285,16 @@ function dashboardaccordion($dbConnection,$query)
 						echo "</td>";
 
 						echo "<td>";
-						echo $row2['output'];
+
+						if (substr($row2['output'],0,4) == "B64|")
+						{
+							echo "<textarea style='width:100%' >" . base64_decode(substr($row2['output'],3)) . "</textarea>";
+						}
+						else
+						{
+							echo "<textarea style='width:100%' >" . $row2['output'] . "</textarea>";
+						}
+
 						echo "</td>";
 
 						echo "<td>";
