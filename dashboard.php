@@ -140,7 +140,9 @@ if ($_GET['page'] == '')
 	//Setup for new endpoint
 	$_SESSION['CSRFTOKEN'] = md5(time());
 	?>
-	<h3>Add a New Endpoint</h3>
+	<button class="accordion">Add a New Endpoint</button>
+	<div class="panel">
+			<p>
 	<form action='dashboard.php' method='post'>
 	<table border=0>
 	<tr>
@@ -153,148 +155,30 @@ if ($_GET['page'] == '')
 	<input type="hidden" id="csrf" name="csrf" value=<?php echo '"' . $_SESSION['CSRFTOKEN'] . '"'; ?>>
 	<input type="submit" value="Submit">
 	</form><br>
+	</p>
+	</div>
 
 	<?php
 
 	//== Display endpoints and latest scan ==
 
-	?><h3>Active Endpoints</h3><?php
-	//Get endpoints
-	$stmt = $dbConnection->query("SELECT * FROM endpoints WHERE epenabled = 1")->fetchAll();
-
+	//Check and see if anything has an active alarm
+	$stmt = $dbConnection->query("SELECT DISTINCT epid FROM endpoints WHERE epenabled = 1")->fetchAll();
 	foreach ($stmt as $row) 
 	{
-		if ($row['domain'] != '')
-			$endpointname = $row['domain'];
-		elseif ($row['ipaddress'] != '')
-			$endpointname = $row['ipaddress'];
-		else
-			$endpointname = $row['epid'];
-		
-		?>
-		<br>
-		<button class="accordion"><?php echo $endpointname; ?></button>
-		<div class="panel">
-			<p>
-		<table border=1>
-					<tr>
-						<td>Endpoint ID</td><td><?php echo $row['epid']; ?></td>
-					</tr><tr>
-						<td>Domain</td><td><?php echo $row['domain']; ?></td>
-					</tr><tr>
-						<td>IP Address</td><td><?php echo $row['ipaddress']; ?></td>
-					</tr><tr>
-						<td>Added</td><td><?php echo $row['added']; ?></td>
-					</tr><tr>
-						<td>Last Scanned</td><td><?php echo $row['lastcheck']; ?></td>
-					</tr><tr>
-						<td>Root Domain?</td><td><?php echo $row['rootdomain']; ?></td>
-					</tr>
-				</table>
-				<br><br>
-				Last Scan Results:
-				<table border=1>
-					<tr>
-						<td>Test Name and Timestamp</td><td>Output</td><td>Alarm</td>
-					</tr>
-				<?php
-					$stmt2 = $dbConnection->query("SELECT * FROM ep_test_results WHERE epid = " . $row['epid'] . " AND checkid = (SELECT DISTINCT checkid FROM ep_test_results WHERE epid = " . $row['epid'] . " ORDER BY checktime DESC LIMIT 1)")->fetchAll();
-
-					foreach ($stmt2 as $row2) 
-					{
-						echo "<tr>";
-						
-						echo "<td>";
-						echo $row2['name'] . "<br>" . $row2['checktime'];
-						echo "</td>";
-
-						echo "<td>";
-						echo $row2['output'];
-						echo "</td>";
-
-						echo "<td>";
-						echo $row2['alarm'];
-						echo "</td>";
-
-						echo "</tr>";
-					}
-				?>
-				</table>
-				</p>
-
-		</div>
-
-		<?php
+		activealarms($dbConnection,0,$row['epid']);
 	}
+
+	?><h2>Active Endpoints</h2><?php
+	
+	?><h4>Endpoints with Alarms</h4><?php
+	dashboardaccordion($dbConnection,"SELECT * FROM endpoints WHERE epenabled = 1 AND activealarm = 1");
+
+	?><h4>Endpoints In Compliance</h4><?php
+	dashboardaccordion($dbConnection,"SELECT * FROM endpoints WHERE epenabled = 1 AND activealarm = 0");
 
 	?><h3>Inactive Endpoints</h3><?php
-	//Get endpoints
-	$stmt = $dbConnection->query("SELECT * FROM endpoints WHERE epenabled = 0")->fetchAll();
-
-	foreach ($stmt as $row) 
-	{
-		if ($row['domain'] != '')
-			$endpointname = $row['domain'];
-		elseif ($row['ipaddress'] != '')
-			$endpointname = $row['ipaddress'];
-		else
-			$endpointname = $row['epid'];
-		
-		?>
-		<br>
-		<button class="accordion"><?php echo $endpointname; ?></button>
-		<div class="panel">
-			<p>
-		<table border=1>
-					<tr>
-						<td>Endpoint ID</td><td><?php echo $row['epid']; ?></td>
-					</tr><tr>
-						<td>Domain</td><td><?php echo $row['domain']; ?></td>
-					</tr><tr>
-						<td>IP Address</td><td><?php echo $row['ipaddress']; ?></td>
-					</tr><tr>
-						<td>Added</td><td><?php echo $row['added']; ?></td>
-					</tr><tr>
-						<td>Last Scanned</td><td><?php echo $row['lastcheck']; ?></td>
-					</tr><tr>
-						<td>Root Domain?</td><td><?php echo $row['rootdomain']; ?></td>
-					</tr>
-				</table>
-				<br><br>
-				Last Scan Results:
-				<table border=1>
-					<tr>
-						<td>Test Name and Timestamp</td><td>Output</td><td>Alarm</td>
-					</tr>
-				<?php
-					$stmt2 = $dbConnection->query("SELECT * FROM ep_test_results WHERE epid = " . $row['epid'] . " AND checkid = (SELECT DISTINCT checkid FROM ep_test_results WHERE epid = " . $row['epid'] . " ORDER BY checktime DESC LIMIT 1)")->fetchAll();
-
-					foreach ($stmt2 as $row2) 
-					{
-						echo "<tr>";
-						
-						echo "<td>";
-						echo $row2['name'] . "<br>" . $row2['checktime'];
-						echo "</td>";
-
-						echo "<td>";
-						echo $row2['output'];
-						echo "</td>";
-
-						echo "<td>";
-						echo $row2['alarm'];
-						echo "</td>";
-
-						echo "</tr>";
-					}
-				?>
-				</table>
-				</p>
-
-		</div>
-
-		<?php
-	}
+	dashboardaccordion($dbConnection,"SELECT * FROM endpoints WHERE epenabled = 0");
 	
 	
 }

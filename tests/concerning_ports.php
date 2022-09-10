@@ -16,10 +16,12 @@ function apetest_concerning_ports($dbConnection,$checkid,$data)
         $port_array = array(20,21,23,25,37,42,49,53,119,123,161,194,433,601,902,903,1433,1434,1476,1723,2049,2375,2376,2377,3306);
 
         $looper = 0;
-        $result = '';
+        $result = array();
 
         while ($port_array[$looper] != '')
         {
+            $tempresult = '';
+
             $fp = fsockopen($endpoint, $port_array[$looper], $errno, $errstr, 2);
         
             if ($fp == FALSE)
@@ -28,7 +30,10 @@ function apetest_concerning_ports($dbConnection,$checkid,$data)
             } 
             else 
             {
-                $result = $result . 'PORT ' . $port_array[$looper] . ' OPEN | ';
+                $tempresult = array("port" => $port_array[$looper], "status" => "open");
+
+                array_push($result,$tempresult);
+
                 fclose($fp);
             }
 
@@ -52,6 +57,11 @@ function apetest_concerning_ports($dbConnection,$checkid,$data)
     {
         $result = 0;
         $alarm = 0;
+    }
+
+    if (is_array($result))
+    {
+        $result = json_encode($result);
     }
 
     insert_result($dbConnection,$checkid,$data['epid'],'apetest_concerning_ports',$result,$alarm);

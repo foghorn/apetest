@@ -128,6 +128,95 @@ function announcementDisplay($title,$text,$link)
 	<?
 }
 
+function activealarms($dbConnection,$checkid = 0,$epid = 0)
+{
+    //If no check ID provided, find the latest one
+    if (($checkid == 0) AND ($epid != ''))
+    {
+        $stmt = $dbConnection->query("SELECT DISTINCT checkid, checktime FROM `ep_test_results` WHERE epid = " . $epid . " ORDER BY checktime LIMIT 1");
+        $row = $stmt->fetch();
+
+        $checkid = $row['checkid'];
+    }
+
+    $stmt = $dbConnection->query("SELECT MAX(alarm),epid FROM ep_test_results WHERE checkid = '" . $checkid . "'");
+    $row = $stmt->fetch();
+
+
+    $stmt = $dbConnection->prepare('UPDATE endpoints SET activealarm = :alarm WHERE epid = :epid');
+    $stmt->execute([ 'epid' => $row['epid'], "alarm" => $row['MAX(alarm)'] ]);
+}
+
+function dashboardaccordion($dbConnection,$query)
+{
+    $stmt = $dbConnection->query($query)->fetchAll();
+
+	foreach ($stmt as $row) 
+	{
+		if ($row['domain'] != '')
+			$endpointname = $row['domain'];
+		elseif ($row['ipaddress'] != '')
+			$endpointname = $row['ipaddress'];
+		else
+			$endpointname = $row['epid'];
+		
+		?>
+		<br>
+		<button class="accordion"><?php echo $endpointname; ?></button>
+		<div class="panel">
+			<p>
+		<table border=1>
+					<tr>
+						<td>Endpoint ID</td><td><?php echo $row['epid']; ?></td>
+					</tr><tr>
+						<td>Domain</td><td><?php echo $row['domain']; ?></td>
+					</tr><tr>
+						<td>IP Address</td><td><?php echo $row['ipaddress']; ?></td>
+					</tr><tr>
+						<td>Added</td><td><?php echo $row['added']; ?></td>
+					</tr><tr>
+						<td>Last Scanned</td><td><?php echo $row['lastcheck']; ?></td>
+					</tr><tr>
+						<td>Root Domain?</td><td><?php echo $row['rootdomain']; ?></td>
+					</tr>
+				</table>
+				<br><br>
+				Last Scan Results:
+				<table border=1>
+					<tr>
+						<td>Test Name and Timestamp</td><td>Output</td><td>Alarm</td>
+					</tr>
+				<?php
+					$stmt2 = $dbConnection->query("SELECT * FROM ep_test_results WHERE epid = " . $row['epid'] . " AND checkid = (SELECT DISTINCT checkid FROM ep_test_results WHERE epid = " . $row['epid'] . " ORDER BY checktime DESC LIMIT 1)")->fetchAll();
+
+					foreach ($stmt2 as $row2) 
+					{
+						echo "<tr>";
+						
+						echo "<td>";
+						echo $row2['name'] . "<br>" . $row2['checktime'];
+						echo "</td>";
+
+						echo "<td>";
+						echo $row2['output'];
+						echo "</td>";
+
+						echo "<td>";
+						echo $row2['alarm'];
+						echo "</td>";
+
+						echo "</tr>";
+					}
+				?>
+				</table>
+				</p>
+
+		</div>
+
+		<?php
+	}
+}
+
 function endpoint_check($dbConnection,$endpoint = '',$rootdomain = 0)
 {
     //Domain name for endpoint

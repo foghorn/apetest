@@ -104,11 +104,13 @@ foreach (glob("tests/*.php") as $filename)
     include $filename;
 }
 
-//Create a UUID for the check
-$checkid = guidv4(openssl_random_pseudo_bytes(16));
+
 
 while (($looper > 0) AND ($domainarray[($looper-1)]['epid'] != ''))
 {
+    //Create a UUID for the check
+    $checkid = guidv4(openssl_random_pseudo_bytes(16));
+    
     $looper = $looper - 1;
 
     //Make sure that the identified endpoint is still valid, if a domain name
@@ -147,6 +149,8 @@ while (($looper > 0) AND ($domainarray[($looper-1)]['epid'] != ''))
             $testloop++;
         }
     }
+
+    activealarms($dbConnection,$checkid);
 }
 
 

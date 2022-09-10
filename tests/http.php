@@ -18,7 +18,7 @@ function apetest_http($dbConnection,$checkid,$data)
         //Port closed
         if ($fp == FALSE)
         {
-        $result = 0;
+            $result = 0;
         } 
         //Port open
         else 

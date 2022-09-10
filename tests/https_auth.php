@@ -21,12 +21,14 @@ function apetest_https_auth($dbConnection,$checkid,$data)
         
         while (($check > 0) AND ($check < 10))
         {
+            $redirect = '';
+            
             $return = array_change_key_case(get_headers($url, true),CASE_LOWER);
 
-            if ($return['location'] != '')
+            if (($return['location'] != '') AND (is_array($return['location']) == FALSE))
                 $redirect = ($return['location']);
             elseif ((is_array($return['location'])) AND ($return['location'][0] != ''))
-                $redirect = ($return['location']);
+                $redirect = ($return['location'][0]);
 
 
             //See if this is redirecting to another page on the site
@@ -59,12 +61,12 @@ function apetest_https_auth($dbConnection,$checkid,$data)
             }
             elseif ($return[0] != '')
             {
-                if (substr_count($result[0],'401') > 0)
+                if (substr_count($return[0],'401') > 0)
                 {
                     $result = "401 Unauthorized";
                     $alert = 0;
                 }
-                else
+                elseif (substr_count($return[0],'200') > 0)
                 {
                     $result = "NO AUTH DETECTED";
                     $alert = 1;
