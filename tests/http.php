@@ -10,19 +10,31 @@ function apetest_http($dbConnection,$checkid,$data)
         $endpoint = $data['domain'];
     elseif ($data['ipaddress'] != '')
         $endpoint = $data['ipaddress'];
+
+    $result = '';
     
     if ($endpoint != '')
     {
-        $fp = get_headers('http://' . $endpoint . '/', true);
+        $fp = fsockopen($endpoint, 80, $errno, $errstr, 2);
+
+        
 	
-        if (is_array($fp))
+        if ($fp == FALSE)
         {
-            $result = json_encode($fp);
+            $result = "Port not open";
         } 
         //Port open
         else 
         {
-            $result = "Unable to fetch headers";
+            $out = "GET / HTTP/1.1\r\n";
+            $out .= "Host: " . $endpoint . "\r\n";
+            $out .= "Connection: Close\r\n\r\n";
+            fwrite($fp, $out);
+
+            while (!feof($fp)) {
+                $result = $result . fgets($fp, 128);
+            }
+            fclose($fp);
         }
     }
     else

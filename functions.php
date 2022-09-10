@@ -97,8 +97,8 @@ function navHeader()
 			  <ul class="dropdown-menu dropdown-user">
 			    <li><a href="dashboard.php">Home</a> </li>
 				<li class="divider"></li>
-				<!--<li><a href="settings.php">Account Settings</a> </li>
-				<li><a href="ticket.php">Support Tickets</a> </li>-->
+				<li><a href="ilist.php">Ignore List</a> </li>
+				<!--<li><a href="ticket.php">Support Tickets</a> </li>-->
 				<li class="divider"></li>
 				<li><a href="index.php?logout=1"> Logout</a> </li>
 			  </ul>
@@ -128,6 +128,29 @@ function announcementDisplay($title,$text,$link)
 	<?
 }
 
+function endpointdecode($dbConnection,$epid)
+{
+	if ($epid == '*')
+	{
+		$return = 'Any';
+	}
+	else
+	{
+		$stmt = $dbConnection->prepare('SELECT * FROM endpoints  WHERE epid = :endpoint');
+		$stmt->execute([ 'endpoint' => $epid ]);
+		$row = $stmt->fetch();
+	
+		$return = '';
+	
+		if ($row['domain'] != '')
+			$return = $row['domain'];
+		elseif ($row['ipaddress'] != '')
+			$return = $row['ipaddress'];
+	}
+	
+	return $return;
+}
+
 function activealarms($dbConnection,$checkid = 0,$epid = 0)
 {
     //If no check ID provided, find the latest one
@@ -139,20 +162,82 @@ function activealarms($dbConnection,$checkid = 0,$epid = 0)
         $checkid = $row['checkid'];
     }
 
-    $stmt = $dbConnection->query("SELECT MAX(alarm),epid FROM ep_test_results WHERE checkid = '" . $checkid . "'");
-    $row = $stmt->fetch();
+	//Grab the ignore list
+	$ilist = $dbConnection->query("SELECT * FROM ignorelist")->fetchAll();
+	
+
+	//Check all of the alerts in the latest run
+    $stmt = $dbConnection->query("SELECT * FROM ep_test_results WHERE checkid = '" . $checkid . "'")->fetchAll();
+
+	$alarm = 0;
+
+	foreach ($stmt as $row) 
+	{
+
+		if ($row['alarm'] == 1)
+		{
+			reset($ilist);
+
+			foreach ($ilist as $ilrow) 
+			{
+				//If the endpoint ID matches either directly or as a wildcard
+				if (($ilrow['epid'] == $row['epid']) OR ($ilrow['epid'] == "*"))
+				{
+					//If the check name matches directly or as a wildcard
+					if (($ilrow['checkname'] == $row['name']) OR ($ilrow['checkname'] == "*"))
+					{
+						
+						//If there is a value associated with the check to investigate, see if the MD5 matches
+						if (($ilrow['checkval'] != '') AND ($ilrow['checkval'] == md5($row['output'])))
+						{					
+							//Alarm should be ignored
+							$alarm = $alarm;
+						}
+						elseif ($ilrow['checkval'] == '')
+						{
+							//Nothing to validate, alarm should be ignored
+							$alarm = $alarm;
+						}
+						else
+						{
+							$alarm = 1;
+						}
+					}
+					else
+					{
+						$alarm = 1;
+					}
+				}
+				else
+				{
+					$alarm = 1;
+				}
+			}
+		}
+		else
+		{
+			$alarm = $alarm;
+		}
+
+	}
 
 
     $stmt = $dbConnection->prepare('UPDATE endpoints SET activealarm = :alarm WHERE epid = :epid');
-    $stmt->execute([ 'epid' => $row['epid'], "alarm" => $row['MAX(alarm)'] ]);
+    $stmt->execute([ 'epid' => $row['epid'], "alarm" => $alarm ]);
 }
 
 function dashboardaccordion($dbConnection,$query)
 {
-    $stmt = $dbConnection->query($query)->fetchAll();
+    
+	//Read in the ignore list for reference
+	$ilist = $dbConnection->query("SELECT * FROM ignorelist")->fetchAll();
+	
+	//Query for all endpoints in this run
+	$stmt = $dbConnection->query($query)->fetchAll();
 
 	foreach ($stmt as $row) 
 	{
+		
 		if ($row['domain'] != '')
 			$endpointname = $row['domain'];
 		elseif ($row['ipaddress'] != '')
@@ -190,7 +275,8 @@ function dashboardaccordion($dbConnection,$query)
 					$stmt2 = $dbConnection->query("SELECT * FROM ep_test_results WHERE epid = " . $row['epid'] . " AND checkid = (SELECT DISTINCT checkid FROM ep_test_results WHERE epid = " . $row['epid'] . " ORDER BY checktime DESC LIMIT 1)")->fetchAll();
 
 					foreach ($stmt2 as $row2) 
-					{
+					{						
+						
 						echo "<tr>";
 						
 						echo "<td>";
@@ -202,7 +288,52 @@ function dashboardaccordion($dbConnection,$query)
 						echo "</td>";
 
 						echo "<td>";
-						echo $row2['alarm'];
+
+						//If there is an alarm, see if we are ignoring it
+						if ($row2['alarm'] == 1)
+						{
+							//Reset pointer for ignore list
+							reset($ilist);
+
+							$result = "ACTIVE<br>
+							<form action='ilist.php' method='post'>
+							<input type='hidden' id='csrf' name='csrf' value='" . $_SESSION['CSRFTOKEN'] . "'>
+							<input type='hidden' id='epid' name='epid' value='" . $row['epid'] . "'>
+							<input type='hidden' id='cname' name='cname' value='" . $row2['name'] . "'>
+							<input type='hidden' id='val' name='val' value='" . md5($row2['output']) . "'>
+							<input type='submit' value='Ignore'>
+							</form>";
+
+							foreach ($ilist as $ilrow) 
+							{
+								//If the endpoint ID matches either directly or as a wildcard
+								if (($ilrow['epid'] == $row['epid']) OR ($ilrow['epid'] == "*"))
+								{
+									//If the check name matches directly or as a wildcard
+									if (($ilrow['checkname'] == $row2['name']) OR ($ilrow['checkname'] == "*"))
+									{
+										//If there is a value associated with the check to investigate, see if the MD5 matches
+										if (($ilrow['checkval'] != '') AND ($ilrow['checkval'] == md5($row2['output'])))
+										{
+											//Alarm should be ignored
+											$result = "Ignored";
+										}
+										elseif ($ilrow['checkval'] == '')
+										{
+											//Nothing to validate, alarm should be ignored
+											$result = "Ignored";
+										}
+									}
+								}
+							}
+
+							echo $result;
+						}
+						else
+						{
+							echo "OK";
+						}
+
 						echo "</td>";
 
 						echo "</tr>";

@@ -88,6 +88,11 @@ function apetest_https_auth($dbConnection,$checkid,$data)
             else
             {
                 $result = "ERROR: Cannot open stream - redirected " . $check . " times";
+
+                if ($check > 0)
+                    $result = $result . " The target SSL certificate may not be valid, or the site may not be responding.";
+
+
                 $alert = 1;
                 $check = 0;
             }
