@@ -13,20 +13,16 @@ function apetest_https($dbConnection,$checkid,$data)
     
     if ($endpoint != '')
     {
-        $fp = fsockopen($endpoint, 443, $errno, $errstr, 2);
+        $fp = get_headers('https://' . $endpoint . '/', true);
 	
-        //Port closed
-        if ($fp == FALSE)
+        if (is_array($fp))
         {
-            $result = 0;
+            $result = json_encode($fp);
         } 
         //Port open
         else 
         {
-            $result = get_headers('https://' . $endpoint . '/', true);
-
-            $result = json_encode($result);
-            fclose($fp);
+            $result = "Unable to fetch headers";
         }
     }
     else
