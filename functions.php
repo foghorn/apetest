@@ -156,11 +156,21 @@ function activealarms($dbConnection,$checkid = 0,$epid = 0)
     //If no check ID provided, find the latest one
     if (($checkid == 0) AND ($epid != ''))
     {
-        $stmt = $dbConnection->query("SELECT DISTINCT checkid, checktime FROM `ep_test_results` WHERE epid = " . $epid . " ORDER BY checktime LIMIT 1");
+        $stmt = $dbConnection->query("SELECT DISTINCT epid, checkid, checktime FROM `ep_test_results` WHERE epid = " . $epid . " ORDER BY checktime DESC LIMIT 1");
         $row = $stmt->fetch();
 
         $checkid = $row['checkid'];
+		$epid = $epid;
     }
+	//Otherwise, find the epid from the checkid
+	else
+	{
+		$stmt = $dbConnection->query("SELECT DISTINCT epid, checkid, checktime FROM `ep_test_results` WHERE checkid = '" . $checkid . "' ORDER BY checktime DESC LIMIT 1");
+        $row = $stmt->fetch();
+
+        $checkid = $checkid;
+		$epid = $row['epid'];
+	}
 
 	//Grab the ignore list
 	$ilist = $dbConnection->query("SELECT * FROM ignorelist")->fetchAll();
@@ -173,44 +183,35 @@ function activealarms($dbConnection,$checkid = 0,$epid = 0)
 
 	foreach ($stmt as $row) 
 	{
-
-		if ($row['alarm'] == 1)
+		//If there is not yet an alarm set, check if we should flag this one
+		if (($row['alarm'] == 1) AND ($alarm == 0))
 		{
+			//Reset pointer
 			reset($ilist);
 
+			$alarm = 1;
+
+			//Check each exception to see if it matches
 			foreach ($ilist as $ilrow) 
 			{
 				//If the endpoint ID matches either directly or as a wildcard
-				if (($ilrow['epid'] == $row['epid']) OR ($ilrow['epid'] == "*"))
+				if (($ilrow['epid'] == $epid) OR ($ilrow['epid'] == "*"))
 				{
 					//If the check name matches directly or as a wildcard
 					if (($ilrow['checkname'] == $row['name']) OR ($ilrow['checkname'] == "*"))
 					{
-						
 						//If there is a value associated with the check to investigate, see if the MD5 matches
 						if (($ilrow['checkval'] != '') AND ($ilrow['checkval'] == md5($row['output'])))
 						{					
 							//Alarm should be ignored
-							$alarm = $alarm;
+							$alarm = 0;
 						}
 						elseif ($ilrow['checkval'] == '')
 						{
 							//Nothing to validate, alarm should be ignored
-							$alarm = $alarm;
-						}
-						else
-						{
-							$alarm = 1;
+							$alarm = 0;
 						}
 					}
-					else
-					{
-						$alarm = 1;
-					}
-				}
-				else
-				{
-					$alarm = 1;
 				}
 			}
 		}
@@ -223,7 +224,7 @@ function activealarms($dbConnection,$checkid = 0,$epid = 0)
 
 
     $stmt = $dbConnection->prepare('UPDATE endpoints SET activealarm = :alarm WHERE epid = :epid');
-    $stmt->execute([ 'epid' => $row['epid'], "alarm" => $alarm ]);
+    $stmt->execute([ 'epid' => $epid, "alarm" => $alarm ]);
 }
 
 function dashboardaccordion($dbConnection,$query)

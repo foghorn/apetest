@@ -18,13 +18,12 @@ function apetest_ssl($dbConnection,$checkid,$data)
         $orignal_parse = parse_url($url, PHP_URL_HOST);
         $get = stream_context_create(array("ssl" => array("capture_peer_cert" => TRUE)));
         $read = stream_socket_client("ssl://".$orignal_parse.":443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $get);
-        $cert = stream_context_get_params($read);
-        $certinfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);
         
 	
-        if (is_array($certinfo))
+        if (is_array($read))
         {
-            $testarray = array();
+            $cert = stream_context_get_params($read);
+            $certinfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);
 
             //Check if cert is going to expire within the next month
             if ($certinfo['validTo_time_t'] < (time() + 2592000))
