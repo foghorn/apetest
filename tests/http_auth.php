@@ -56,7 +56,7 @@ function apetest_http_auth($dbConnection,$checkid,$data)
                     }
                     else
                     {
-                        $result = "Redirect to unknown third party";
+                        $result = "Redirect to " . $redirect;
                         $alert = 1;
                     }
 
