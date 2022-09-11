@@ -29,11 +29,10 @@ function apetest_http_auth($dbConnection,$checkid,$data)
             {
                 $return = array_change_key_case($temp,CASE_LOWER);
 
-                if (($return['location'] != '') AND (is_array($return['location']) == FALSE))
-                    $redirect = ($return['location']);
-                elseif ((is_array($return['location'])) AND ($return['location'][0] != ''))
-                    $redirect = ($return['location'][0]);
+                $redirect = $return['location'];
 
+                if (is_array($redirect) AND ($return['location'][0] != ''))
+                    $redirect = ($return['location'][0]);
 
                 //See if this is redirecting to another page on the site
                 if (($redirect != '') AND (substr_count(strtolower($redirect),strtolower($endpoint)) > 0))

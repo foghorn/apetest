@@ -20,7 +20,7 @@ function apetest_ssl($dbConnection,$checkid,$data)
         $read = stream_socket_client("ssl://".$orignal_parse.":443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $get);
         
 	
-        if (is_array($read))
+        if ($read != FALSE)
         {
             $cert = stream_context_get_params($read);
             $certinfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);

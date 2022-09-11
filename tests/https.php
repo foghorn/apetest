@@ -15,7 +15,7 @@ function apetest_https($dbConnection,$checkid,$data)
     
     if ($endpoint != '')
     {
-        $fp = fsockopen($endpoint, 80, $errno, $errstr, 2);
+        $fp = fsockopen($endpoint, 443, $errno, $errstr, 2);
 
         
 	
@@ -26,17 +26,9 @@ function apetest_https($dbConnection,$checkid,$data)
         //Port open
         else 
         {
-            $out = "GET / HTTP/1.1\r\n";
-            $out .= "Host: " . $endpoint . "\r\n";
-            $out .= "Connection: Close\r\n\r\n";
-            fwrite($fp, $out);
+            $result = get_headers('https://' . $endpoint . '/', true);
 
-            while (!feof($fp)) {
-                $result = $result . fgets($fp, 128);
-            }
-            fclose($fp);
-
-            $result = "B64|" . base64_encode($result);
+            $result = json_encode($result);
         }
     }
     else
